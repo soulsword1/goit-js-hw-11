@@ -5,7 +5,6 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const galleryEl = document.querySelector('.gallery');
-const bodyEl = document.querySelector('body');
 const searchFormEl = document.querySelector('.search-form');
 const inputQueryEl = document.querySelector('input[name="searchQuery"]');
 // const loadMoreBtnEl = document.querySelector('.load-more');
