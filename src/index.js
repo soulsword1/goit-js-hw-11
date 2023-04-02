@@ -1,19 +1,33 @@
 import fetchImages from './js/fetchImages';
 import SimpleLightbox from 'simplelightbox';
+import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const galleryEl = document.querySelector('.gallery');
+const bodyEl = document.querySelector('body');
 const searchFormEl = document.querySelector('.search-form');
 const inputQueryEl = document.querySelector('input[name="searchQuery"]');
-const loadMoreBtnEl = document.querySelector('.load-more');
+// const loadMoreBtnEl = document.querySelector('.load-more');
+
 let name = null;
 let page = 1;
 let counter = 0;
 let totalImages = 0;
+let scroll = 0;
 
 searchFormEl.addEventListener('submit', searchAndShow);
-loadMoreBtnEl.addEventListener('click', loadMoreImages);
+window.addEventListener('scroll', throttle(InfiniteScroll, 500));
+// loadMoreBtnEl.addEventListener('click', loadMoreImages);
+
+function InfiniteScroll() {
+  const { scrollTop, scrollHeight } = document.documentElement;
+  scroll = scrollHeight - 1000;
+  if (scrollTop >= scroll) {
+    loadMoreImages();
+    scroll = scrollHeight - 1000;
+  }
+}
 
 function searchAndShow(e) {
   e.preventDefault();
@@ -28,7 +42,7 @@ async function loadMoreImages() {
   page += 1;
   counter += 40;
   await imagesTemplate(name);
-  await smoothScroll();
+  smoothScroll();
 }
 
 async function imagesTemplate(query) {
@@ -37,7 +51,7 @@ async function imagesTemplate(query) {
   totalImages = data.totalHits;
 
   if (totalImages === 0) {
-    loadMoreBtnEl.classList.add('is-hidden');
+    // loadMoreBtnEl.classList.add('is-hidden');
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
@@ -48,9 +62,9 @@ async function imagesTemplate(query) {
     Notify.success(`Hooray! We found ${totalImages} images.`);
   }
 
-  counter > totalImages
-    ? loadMoreBtnEl.classList.add('is-hidden')
-    : loadMoreBtnEl.classList.remove('is-hidden');
+  counter > totalImages;
+  // ? loadMoreBtnEl.classList.add('is-hidden')
+  // : loadMoreBtnEl.classList.remove('is-hidden');
   galleryEl.insertAdjacentHTML('beforeend', createMarkup(images));
   useSimpleLightbox();
 }
@@ -99,16 +113,13 @@ function useSimpleLightbox() {
   gallery.on('show.simplelightbox');
 }
 
-function smoothScroll(){
-    const { height: cardHeight } = document
-  .querySelector(".gallery");
-  console.log(document
-    .querySelector(".gallery").firstElementChild.getBoundingClientRect());
+function smoothScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
 
-window.scrollBy({
-  top: cardHeight * 2,
-  behavior: "smooth",
-});
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
-
-
